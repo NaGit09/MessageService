@@ -1,8 +1,11 @@
 spring:
+  
   application:
     name: MessageService
+
   devtools:
     add-properties: false
+
   data:
     redis:
       host: localhost
@@ -16,12 +19,29 @@ spring:
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  kafka:
+    
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
   jpa:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
     show-sql: true
+
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -34,6 +54,7 @@ spring:
           starttls:
             enable: true
 server:
+  port: ${SERVER_PORT}
   servlet:
     context-path: ${SERVER_PATH}
 
@@ -42,3 +63,9 @@ logging:
     root: info
     org.springframework.web: debug
     web: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

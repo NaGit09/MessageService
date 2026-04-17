@@ -5,11 +5,11 @@ import com.furniro.MessageService.util.MailErrorCode;
 import lombok.Getter;
 
 @Getter
-public class MailException extends RuntimeException {
+public class MailException extends BaseException {
     private final MailErrorCode errorCode;
 
     public MailException(MailErrorCode errorCode) {
-        super(errorCode.getMessage());
+        super(errorCode.getCode(), errorCode.getMessage());
         this.errorCode = errorCode;
     }
 

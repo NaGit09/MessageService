@@ -19,14 +19,14 @@ public class MailService {
     }
 
     @Async
-    public void sendMailaActive(String email, String token) {
+    public void sendMailActive(String email ,String username, String token) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String activationLink = "http://localhost:8080/api/v1/furniro/account/confirm?token=" + token;
+            String activationLink = "http://localhost:8000/api/v1/furniro/account/confirm?token=" + token;
 
-            String content = "<h3>Chào " + ",</h3>"
+            String content = "<h3>Chào " + username + ",</h3>"
                     + "<p>Vui lòng click vào link bên dưới để kích hoạt tài khoản:</p>"
                     + "<a href='" + activationLink + "'>Kích hoạt ngay</a>";
 
@@ -66,4 +66,49 @@ public class MailService {
         }
     }
 
+    @Async
+    public void sendMailPromotion(String email, String fullName, String title, String description, String code) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String content = "<h3>Xin chào " + fullName + ",</h3>"
+                    + "<p>Đây là mã khuyến mãi của bạn : " + code + "</p>"
+                    + "<p>" + description + "</p>";
+
+            helper.setTo(email);
+            helper.setSubject(title);
+            helper.setText(content, true);
+
+            mailSender.send(message);
+            log.info("Email đã gửi mã khuyến mãi đến người dùng : {}", email);
+
+        } catch (MessagingException e) {
+            log.error("Lỗi khi gửi mail: {}", e.getMessage());
+            throw new RuntimeException("Không thể gửi email mã khuyến mãi.");
+        }
+    }
+
+    @Async
+    public void sendMailSubscription(String email, String fullName) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String content = "<h3>Xin chào " + fullName + ",</h3>"
+                    + "<p>Cảm ơn bạn đã đăng ký nhận bản tin của chúng tôi.</p>"
+                    + "<p>Chúng tôi sẽ gửi cho bạn những thông tin mới nhất về sản phẩm và chương trình khuyến mãi.</p>";
+
+            helper.setTo(email);
+            helper.setSubject("Đăng ký nhận bản tin thành công");
+            helper.setText(content, true);
+
+            mailSender.send(message);
+            log.info("Email đã gửi bản tin đến người dùng : {}", email);
+
+        } catch (MessagingException e) {
+            log.error("Lỗi khi gửi mail: {}", e.getMessage());
+            throw new RuntimeException("Không thể gửi email bản tin.");
+        }
+    }
 }

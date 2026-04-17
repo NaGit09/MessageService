@@ -32,9 +32,13 @@ public class Message {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private MessageType type;  
+    private MessageType type;
 
-    private LocalDateTime createdAt;
+    @Builder.Default
+    private Boolean isRead = false;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @PrePersist
     protected void onCreate() {
