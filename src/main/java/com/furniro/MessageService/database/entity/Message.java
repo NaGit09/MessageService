@@ -18,21 +18,25 @@ public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
     @NotNull
-    private Long senderId;
+    private Integer senderId;
+
+    @NotNull
+    private Integer receiverId;
 
     @NotBlank
     @Size(max = 2000)
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private MessageType type;
+    @Builder.Default
+    private MessageType type = MessageType.TEXT;
 
     @Builder.Default
     private Boolean isRead = false;

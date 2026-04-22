@@ -2,6 +2,7 @@ package com.furniro.MessageService.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,23 +11,24 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailService {
 
     private final JavaMailSender mailSender;
 
-    public MailService(JavaMailSender javaMailSender) {
-        this.mailSender = javaMailSender;
-    }
 
     @Async
-    public void sendMailActive(String email ,String username, String token) {
+    public void sendMailActive(
+        String email,
+        String fullName,
+        String accountID) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String activationLink = "http://localhost:8000/api/v1/furniro/account/confirm?token=" + token;
+            String activationLink = "http://localhost:8000/api/v1/furniro/account/active?id=" + accountID;
 
-            String content = "<h3>Chào " + username + ",</h3>"
+            String content = "<h3>Chào " + fullName + ",</h3>"
                     + "<p>Vui lòng click vào link bên dưới để kích hoạt tài khoản:</p>"
                     + "<a href='" + activationLink + "'>Kích hoạt ngay</a>";
 
@@ -44,7 +46,10 @@ public class MailService {
     }
 
     @Async
-    public void sendMailOTP(String username, String email, String OPT) {
+    public void sendMailOTP(
+        String username,
+        String email,
+        String OPT) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -67,7 +72,12 @@ public class MailService {
     }
 
     @Async
-    public void sendMailPromotion(String email, String fullName, String title, String description, String code) {
+    public void sendMailPromotion(
+        String email,
+        String fullName,
+        String title,
+        String description,
+        String code) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -90,7 +100,9 @@ public class MailService {
     }
 
     @Async
-    public void sendMailSubscription(String email, String fullName) {
+    public void sendMailSubscription(
+        String email,
+        String fullName) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

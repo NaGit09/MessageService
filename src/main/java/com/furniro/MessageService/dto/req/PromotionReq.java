@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PromotionReq {
+    
+    private Integer id;
+
     @NotBlank(message = "Tiêu đề không được để trống")
     @Size(min = 2, max = 100, message = "Tiêu đề phải từ 2-100 ký tự")
     private String title;

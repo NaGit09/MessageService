@@ -11,9 +11,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
     private final StringRedisTemplate caching;
+    private static final long OTP_VALID_DURATION = 5;
 
     @Async
-    public void addData(String key, String value, long timeout, TimeUnit unit) {
+    public void addData(
+        String key,
+        String value,
+        long timeout,
+        TimeUnit unit) {
         caching.opsForValue().set(key, value, timeout, unit);
     }
 
@@ -29,4 +34,21 @@ public class RedisService {
     public String getData(String key) {
         return caching.opsForValue().get(key);
     }
+
+    @Async
+    public String generateOtp(String key) {
+        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
+        caching.opsForValue().set(key, otp, OTP_VALID_DURATION, TimeUnit.MINUTES);
+        return otp;
+    }
+
+    public boolean verifyOtp(String key, String otp) {
+        String storedOtp = caching.opsForValue().get(key);
+        if(storedOtp != null && storedOtp.equals(otp)) {
+            caching.delete(key);
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.furniro.MessageService.database.entity;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,16 +23,18 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    private String userId;
-    private String senderId;
+    private Integer userID;
 
     private String type;
-    private String title;
-    private String message;
 
-    private Boolean isRead;
+    private String title;
+    
+    private String content;
+
+    @Builder.Default
+    private Boolean isRead = false;
 
     @Builder.Default
     private Instant createdAt = Instant.now();

@@ -16,14 +16,14 @@ public class Conversation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotNull
-    private Long buyerId;
+    private Integer buyerId;
 
     @NotNull
     @Builder.Default
-    private Long staffId = 1L;
+    private Integer staffId = 1;
 
     @Builder.Default
     private LocalDateTime lastMessageAt = LocalDateTime.now();
@@ -33,13 +33,19 @@ public class Conversation {
     private String lastMessageContent = "";
 
     @Builder.Default
-    private Boolean isRead = false;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
