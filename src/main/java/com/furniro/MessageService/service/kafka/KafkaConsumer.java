@@ -27,14 +27,16 @@ public class KafkaConsumer {
     private final NotificationService notificationService;
 
     @Transactional
-    @KafkaListener(topics = "auth.send.active", groupId = "auth-service-group")
+    @KafkaListener(topics = "auth.send.active", groupId = "auth-service-group", containerFactory = "kafkaListenerContainerFactory")
     public void onUserCreated(Map<String, Object> event) {
         try {
 
             log.info("Received auth.send.active event: {}", event);
 
             MailActiveReq req = objectMapper.convertValue(event, MailActiveReq.class);
+            
             String fullName = req.getFirstName() + " " + req.getLastName();
+            
             mailService.sendMailActive(req.getEmail(), fullName, req.getAccountID());
 
         } catch (Exception e) {
@@ -44,7 +46,7 @@ public class KafkaConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = "auth.send.otp", groupId = "auth-service-group")
+    @KafkaListener(topics = "auth.send.otp", groupId = "auth-service-group", containerFactory = "kafkaListenerContainerFactory")
     public void onMailOTP(Map<String, Object> event) {
         try {
 
@@ -60,7 +62,7 @@ public class KafkaConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = "notification.created", groupId = "message")
+    @KafkaListener(topics = "notification.created", groupId = "message-service-group", containerFactory = "kafkaListenerContainerFactory")
     public void onNotificationCreated(Map<String, Object> message) {
 
         try {

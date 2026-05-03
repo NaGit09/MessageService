@@ -31,7 +31,7 @@ public class NotificationService {
 
         Page<Notification> notifications = notificationRepository.findByUserID(receiverID, pageable);
 
-        if (notifications == null) {
+        if (notifications.isEmpty()) {
             throw new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND);
         }
 

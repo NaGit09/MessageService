@@ -1,5 +1,7 @@
 package com.furniro.MessageService.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -75,9 +77,10 @@ public class MessageService {
                 .type(messageReq.getMessageType())
                 .build();
 
-        // 3. update conversation
+        // 3. update conversation last message info
+        LocalDateTime now = LocalDateTime.now();
         conversation.setLastMessageContent(message.getContent());
-        conversation.setLastMessageAt(message.getCreatedAt());
+        conversation.setLastMessageAt(now);
 
         // 4. save message and conversation
         messageRepository.save(message);
