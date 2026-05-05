@@ -1,4 +1,4 @@
-package com.furniro.MessageService.dto.req;
+package com.furniro.MessageService.dto.req.Subscription;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package com.furniro.MessageService.util;
+package com.furniro.MessageService.util.error;
 
 import lombok.Getter;
 

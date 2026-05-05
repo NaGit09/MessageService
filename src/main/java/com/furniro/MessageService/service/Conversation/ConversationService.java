@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Conversation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -9,8 +9,11 @@ import com.furniro.MessageService.database.repository.ConversationRepository;
 import com.furniro.MessageService.database.repository.MessageRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
-import com.furniro.MessageService.dto.req.ConversationReq;
+import com.furniro.MessageService.dto.req.Message.ConversationReq;
+import com.furniro.MessageService.exception.imp.MessageException;
+import com.furniro.MessageService.util.error.MessageErrorCode;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,9 +22,11 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConversationService {
+        
     final ConversationRepository conversationRepository;
     final MessageRepository messageRepository;
 
+    @Transactional
     public ResponseEntity<AType> createConversation(ConversationReq req) {
         // 1. create conversation
         Conversation conversation = Conversation.builder()
@@ -58,10 +63,13 @@ public class ConversationService {
     }
 
     public ResponseEntity<AType> getConversationById(int id) {
+        Conversation conversation = conversationRepository.findById(id)
+                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
+
         return ResponseEntity.ok(ApiType.builder()
                 .code(200)
                 .message("Get conversation by id successfully !")
-                .data(conversationRepository.findById(id).orElse(null))
+                .data(conversation)
                 .build());
     }
 }

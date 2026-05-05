@@ -5,8 +5,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import com.furniro.MessageService.database.entity.Message;
-import com.furniro.MessageService.dto.req.MessageReq;
-import com.furniro.MessageService.service.MessageService;
+import com.furniro.MessageService.dto.req.Message.MessageReq;
+import com.furniro.MessageService.service.Conversation.MessageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -6,11 +6,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.furniro.MessageService.dto.req.MailActiveReq;
-import com.furniro.MessageService.dto.req.MailOTPReq;
-import com.furniro.MessageService.dto.req.NotificationReq;
-import com.furniro.MessageService.service.MailService;
-import com.furniro.MessageService.service.NotificationService;
+import com.furniro.MessageService.dto.req.Mail.MailActiveReq;
+import com.furniro.MessageService.dto.req.Mail.MailOTPReq;
+import com.furniro.MessageService.dto.req.Notify.NotificationReq;
+import com.furniro.MessageService.service.Notification.NotificationService;
+import com.furniro.MessageService.service.Other.MailService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,11 @@ public class KafkaConsumer {
     private final NotificationService notificationService;
 
     @Transactional
-    @KafkaListener(topics = "auth.send.active", groupId = "auth-service-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(
+            topics = "auth.send.active", 
+            groupId = "message-service-group", 
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void onUserCreated(Map<String, Object> event) {
         try {
 
@@ -46,7 +50,11 @@ public class KafkaConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = "auth.send.otp", groupId = "auth-service-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(
+        topics = "auth.send.otp", 
+        groupId = "message-service-group", 
+        containerFactory = "kafkaListenerContainerFactory"
+    )
     public void onMailOTP(Map<String, Object> event) {
         try {
 
@@ -62,7 +70,11 @@ public class KafkaConsumer {
     }
 
     @Transactional
-    @KafkaListener(topics = "notification.created", groupId = "message-service-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(
+        topics = "notification.created", 
+        groupId = "message-service-group", 
+        containerFactory = "kafkaListenerContainerFactory"
+    )
     public void onNotificationCreated(Map<String, Object> message) {
 
         try {

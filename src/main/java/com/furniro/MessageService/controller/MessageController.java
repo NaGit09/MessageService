@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.furniro.MessageService.dto.API.AType;
-import com.furniro.MessageService.service.MessageService;
+import com.furniro.MessageService.service.Conversation.MessageService;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Other;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -102,7 +102,7 @@ public class MailService {
     @Async
     public void sendMailSubscription(
         String email,
-        String fullName) {
+            String fullName) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -123,4 +123,5 @@ public class MailService {
             throw new RuntimeException("Không thể gửi email bản tin.");
         }
     }
+
 }

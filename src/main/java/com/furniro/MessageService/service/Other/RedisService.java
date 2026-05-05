@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Other;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class RedisService {
+    
     private final StringRedisTemplate caching;
     private static final long OTP_VALID_DURATION = 5;
 
@@ -35,7 +36,6 @@ public class RedisService {
         return caching.opsForValue().get(key);
     }
 
-    @Async
     public String generateOtp(String key) {
         String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
         caching.opsForValue().set(key, otp, OTP_VALID_DURATION, TimeUnit.MINUTES);

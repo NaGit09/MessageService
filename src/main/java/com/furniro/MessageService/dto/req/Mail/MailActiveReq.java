@@ -1,4 +1,4 @@
-package com.furniro.MessageService.dto.req;
+package com.furniro.MessageService.dto.req.Mail;
 
 import lombok.Data;
 

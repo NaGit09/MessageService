@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Notification;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,9 +11,9 @@ import com.furniro.MessageService.database.entity.Notification;
 import com.furniro.MessageService.database.repository.NotificationRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
-import com.furniro.MessageService.dto.req.NotificationReq;
-import com.furniro.MessageService.exception.NotifyException;
-import com.furniro.MessageService.util.NotificationErrorCode;
+import com.furniro.MessageService.dto.req.Notify.NotificationReq;
+import com.furniro.MessageService.exception.imp.NotifyException;
+import com.furniro.MessageService.util.error.NotificationErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,10 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public ResponseEntity<AType> getAllNotifications
-        (Integer receiverID, Integer page, Integer size, String sortBy) {
+        (Integer receiverID,
+         Integer page,
+         Integer size,
+         String sortBy) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
@@ -43,7 +46,8 @@ public class NotificationService {
     }
 
     public ResponseEntity<AType> createNotification
-        (NotificationReq req) {
+    (NotificationReq req) {
+            
         // create notify
         Notification notification = Notification.builder()
                 .userID(req.getUserID())
@@ -51,6 +55,7 @@ public class NotificationService {
                 .content(req.getMessage())
                 .type(req.getType())
                 .build();
+
         // save notify
         notificationRepository.save(notification);
 
@@ -63,15 +68,19 @@ public class NotificationService {
     }
 
     public ResponseEntity<AType> readNotification
-        (Integer id) {
+    (Integer id) {
+            
         // find notify
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() ->
-                        new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+                new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+                        
         // set read true
         notification.setIsRead(true);
+
         // save notify
         notificationRepository.save(notification);
+        
         // return response
         return ResponseEntity.ok(ApiType.builder()
                 .code(200)

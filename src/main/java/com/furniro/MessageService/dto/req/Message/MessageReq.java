@@ -1,6 +1,6 @@
-package com.furniro.MessageService.dto.req;
+package com.furniro.MessageService.dto.req.Message;
 
-import com.furniro.MessageService.util.MessageType;
+import com.furniro.MessageService.util.enums.MessageType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

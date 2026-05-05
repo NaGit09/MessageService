@@ -1,4 +1,4 @@
-package com.furniro.MessageService.dto.req;
+package com.furniro.MessageService.dto.req.promotion;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
