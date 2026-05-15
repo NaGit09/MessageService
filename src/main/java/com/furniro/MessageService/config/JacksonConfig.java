@@ -15,7 +15,6 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
-        // Đăng ký module để xử lý Java 8 Date/Time (LocalDateTime, v.v.)
         mapper.registerModule(new JavaTimeModule());
 
         // Ngăn lỗi khi gặp các field bị trống
