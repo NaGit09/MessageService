@@ -57,8 +57,6 @@ spring:
 server:
   forward-headers-strategy: framework
   port: ${SERVER_PORT}
-  servlet:
-    context-path: ${SERVER_PATH}
 
 logging:
   level:

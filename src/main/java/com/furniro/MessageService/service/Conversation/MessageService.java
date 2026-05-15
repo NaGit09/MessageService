@@ -1,4 +1,6 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Conversation;
+
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +14,11 @@ import com.furniro.MessageService.database.repository.ConversationRepository;
 import com.furniro.MessageService.database.repository.MessageRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
-import com.furniro.MessageService.dto.req.MessageReq;
+import com.furniro.MessageService.dto.req.Message.MessageReq;
+import com.furniro.MessageService.exception.imp.MessageException;
+import com.furniro.MessageService.util.error.MessageErrorCode;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,11 +27,11 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
 
-    public ResponseEntity<AType> isRead
-        (Integer messageID) {
+    @Transactional
+    public ResponseEntity<AType> isRead(Integer messageID) {
         // 1. find message
         Message message = messageRepository.findById(messageID)
-                .orElseThrow(() -> new RuntimeException("Message not found"));
+                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
 
         // 2. mark as read
         message.setIsRead(true);
@@ -42,11 +47,10 @@ public class MessageService {
                 .build());
     }
 
-    public ResponseEntity<AType> getAllMessage
-        (Integer conversationID, Integer page, Integer size) {
+    public ResponseEntity<AType> getAllMessage(Integer conversationID, Integer page, Integer size) {
         // 1. find conversation
         Conversation conversation = conversationRepository.findById(conversationID)
-                .orElseThrow(() -> new RuntimeException("Conversation not found"));
+                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
 
         // 2. get all message by conversation
         Pageable pageable = PageRequest.of(page, size);
@@ -60,11 +64,11 @@ public class MessageService {
                 .build());
     }
 
-    public Message createMessage
-        (MessageReq messageReq) {
+    @Transactional
+    public Message createMessage(MessageReq messageReq) {
         // 1. find conversation
         Conversation conversation = conversationRepository.findById(messageReq.getConversationId())
-                .orElseThrow(() -> new RuntimeException("Conversation not found"));
+                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
 
         // 2. create message
         Message message = Message.builder()
@@ -75,9 +79,10 @@ public class MessageService {
                 .type(messageReq.getMessageType())
                 .build();
 
-        // 3. update conversation
+        // 3. update conversation last message info
+        LocalDateTime now = LocalDateTime.now();
         conversation.setLastMessageContent(message.getContent());
-        conversation.setLastMessageAt(message.getCreatedAt());
+        conversation.setLastMessageAt(now);
 
         // 4. save message and conversation
         messageRepository.save(message);
@@ -85,6 +90,5 @@ public class MessageService {
 
         // 5. return response
         return message;
-
     }
 }

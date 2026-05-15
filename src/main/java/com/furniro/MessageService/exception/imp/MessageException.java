@@ -1,6 +1,7 @@
-package com.furniro.MessageService.exception;
+package com.furniro.MessageService.exception.imp;
 
-import com.furniro.MessageService.util.MessageErrorCode;
+import com.furniro.MessageService.exception.BaseException;
+import com.furniro.MessageService.util.error.MessageErrorCode;
 
 import lombok.Getter;
 

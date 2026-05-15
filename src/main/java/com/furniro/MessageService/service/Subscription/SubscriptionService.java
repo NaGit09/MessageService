@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Subscription;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -11,9 +11,10 @@ import com.furniro.MessageService.database.entity.Subscription;
 import com.furniro.MessageService.database.repository.SubscriptionRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
-import com.furniro.MessageService.dto.req.SubscriptionReq;
-import com.furniro.MessageService.exception.SubscriptionException;
-import com.furniro.MessageService.util.SubscriptionErrorCode;
+import com.furniro.MessageService.dto.req.Subscription.SubscriptionReq;
+import com.furniro.MessageService.exception.imp.SubscriptionException;
+import com.furniro.MessageService.service.Other.MailService;
+import com.furniro.MessageService.util.error.SubscriptionErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

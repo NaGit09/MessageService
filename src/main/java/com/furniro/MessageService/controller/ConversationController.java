@@ -4,8 +4,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.furniro.MessageService.dto.API.AType;
-import com.furniro.MessageService.dto.req.ConversationReq;
-import com.furniro.MessageService.service.ConversationService;
+import com.furniro.MessageService.dto.req.Message.ConversationReq;
+
+import jakarta.validation.Valid;
+import com.furniro.MessageService.service.Conversation.ConversationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +18,7 @@ public class ConversationController {
     private final ConversationService conversationService;
 
     @PostMapping("/create")
-    public ResponseEntity<AType> createConversation(@RequestBody ConversationReq req) {
+    public ResponseEntity<AType> createConversation(@Valid @RequestBody ConversationReq req) {
         return conversationService.createConversation(req);
     }
 

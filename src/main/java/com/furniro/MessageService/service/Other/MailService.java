@@ -1,4 +1,4 @@
-package com.furniro.MessageService.service;
+package com.furniro.MessageService.service.Other;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -47,23 +47,23 @@ public class MailService {
 
     @Async
     public void sendMailOTP(
-        String username,
         String email,
-        String OPT) {
+        String username,
+        String otp) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             String content = "<h3>Xin chào " + username + ",</h3>"
-                    + "<p>Đây là OPT của bạn : " + OPT + "</p>"
+                    + "<p>Đây là OTP của bạn : " + otp + "</p>"
                     + "<p> Vui lòng không gửi cho bất kỳ ai </p>";
 
             helper.setTo(email);
-            helper.setSubject("OPT xác thực quên mật khẩu");
+            helper.setSubject("OTP xác thực quên mật khẩu");
             helper.setText(content, true);
 
             mailSender.send(message);
-            log.info("Email đã gửi opt đến người dùng : {}", email);
+            log.info("Email đã gửi OTP đến người dùng : {}", email);
 
         } catch (MessagingException e) {
             log.error("Lỗi khi gửi mail: {}", e.getMessage());
@@ -102,7 +102,7 @@ public class MailService {
     @Async
     public void sendMailSubscription(
         String email,
-        String fullName) {
+            String fullName) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -123,4 +123,5 @@ public class MailService {
             throw new RuntimeException("Không thể gửi email bản tin.");
         }
     }
+
 }

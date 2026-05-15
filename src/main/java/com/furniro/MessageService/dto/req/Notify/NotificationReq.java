@@ -1,4 +1,4 @@
-package com.furniro.MessageService.dto.req;
+package com.furniro.MessageService.dto.req.Notify;
 
 
 import jakarta.validation.constraints.NotBlank;

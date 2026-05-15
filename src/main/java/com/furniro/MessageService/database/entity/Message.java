@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-import com.furniro.MessageService.util.MessageType;
+import com.furniro.MessageService.util.enums.MessageType;
 
 @Entity
 @Table(name = "messages")

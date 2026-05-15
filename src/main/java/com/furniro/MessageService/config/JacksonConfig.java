@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Primary;
 public class JacksonConfig {
 
     @Bean
-    @Primary // Đánh dấu đây là Bean ưu tiên hàng đầu
-    public ObjectMapper objectMapper() {
+    @Primary
+    ObjectMapper objectMapper() {
+        
         ObjectMapper mapper = new ObjectMapper();
 
         mapper.registerModule(new JavaTimeModule());
 
-        // Ngăn lỗi khi gặp các field bị trống
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         return mapper;
