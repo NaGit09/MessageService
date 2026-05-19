@@ -38,11 +38,7 @@ public class NotificationService {
             throw new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND);
         }
 
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("get all notification successfully")
-                .data(notifications)
-                .build());
+        return ResponseEntity.ok(ApiType.success(notifications));
     }
 
     public ResponseEntity<AType> createNotification
@@ -60,11 +56,7 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         // return response
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("create notification successfully")
-                .data(notification)
-                .build());
+        return ResponseEntity.ok(ApiType.success(notification));
     }
 
     public ResponseEntity<AType> readNotification
@@ -82,11 +74,7 @@ public class NotificationService {
         notificationRepository.save(notification);
         
         // return response
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("read notification successfully")
-                .data(notification)
-                .build());
+        return ResponseEntity.ok(ApiType.success(notification));
     }
 
 }

@@ -47,11 +47,7 @@ public class SubscriptionService {
         mailService.sendMailSubscription(req.getEmail(), req.getFullName());
         
         // 4. return result !
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Subscribe success")
-                .data(true)
-                .build());
+        return ResponseEntity.ok(ApiType.success(true));
     }
 
     public ResponseEntity<AType> getAllSubscribers
@@ -63,15 +59,11 @@ public class SubscriptionService {
         Page<Subscription> subscribers = subscriptionRepository.findAll(pageable);
 
         // 3. return result !
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Get all subscribers success")
-                .data(subscribers)
-                .build());
+        return ResponseEntity.ok(ApiType.success(subscribers));
     }
 
     public ResponseEntity<AType> deleteSubscriber
-        (Integer id) {
+    (Integer id) {
         // 1. check user subscribed
         if (!subscriptionRepository.existsById(id)) {
             throw new SubscriptionException(SubscriptionErrorCode.SUBSCRIPTION_NOT_FOUND);
@@ -81,10 +73,7 @@ public class SubscriptionService {
         subscriptionRepository.deleteById(id);
 
         // 3. return result !
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Delete subscriber success")
-                .data(true)
-                .build());
+        return ResponseEntity.ok(ApiType.success(true));
     }
+
 }

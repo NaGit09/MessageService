@@ -47,29 +47,17 @@ public class ConversationService {
                 .build();
         messageRepository.save(message);
 
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Create new conversation successfully !")
-                .data(conversation)
-                .build());
+        return ResponseEntity.ok(ApiType.success(conversation));
     }
 
     public ResponseEntity<AType> getAllConversation(Integer userId) {
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Get all conversation successfully !")
-                .data(conversationRepository.findByBuyerIdOrStaffId(userId, userId))
-                .build());
+        return ResponseEntity.ok(ApiType.success(conversationRepository.findByBuyerIdOrStaffId(userId, userId)));
     }
 
     public ResponseEntity<AType> getConversationById(int id) {
         Conversation conversation = conversationRepository.findById(id)
                 .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
 
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Get conversation by id successfully !")
-                .data(conversation)
-                .build());
+        return ResponseEntity.ok(ApiType.success(conversation));
     }
 }

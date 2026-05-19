@@ -63,11 +63,7 @@ public class PromotionService {
                 log.info("Promotion created successfully: {}", promotion.getCode());
 
                 // 5. return response
-                return ResponseEntity.ok(ApiType.builder()
-                                .code(200)
-                                .message("Promotion created successfully")
-                                .data(promotion)
-                                .build());
+                return ResponseEntity.ok(ApiType.success(promotion));
         }
 
         public ResponseEntity<AType> deletePromotion
@@ -80,21 +76,14 @@ public class PromotionService {
 
                 promotionRepository.delete(promotion);
 
-                return ResponseEntity.ok(ApiType.builder()
-                                .code(200)
-                                .message("Promotion deleted successfully")
-                                .build());
+                return ResponseEntity.ok(ApiType.success("Promotion deleted successfully"));
         }
 
         public ResponseEntity<AType> getAllPromotion
                 (int page, int size, String sort) {
                 Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
                 Page<Promotion> promotions = promotionRepository.findAll(pageable);
-                return ResponseEntity.ok(ApiType.builder()
-                                .code(200)
-                                .message("Get all promotions successfully")
-                                .data(promotions)
-                                .build());
+                return ResponseEntity.ok(ApiType.success(promotions));
         }
 
         public ResponseEntity<AType> updatePromotion
@@ -113,11 +102,7 @@ public class PromotionService {
 
                 promotionRepository.save(promotion);
 
-                return ResponseEntity.ok(ApiType.builder()
-                                .code(200)
-                                .message("Promotion updated successfully")
-                                .data(promotion)
-                                .build());
+                return ResponseEntity.ok(ApiType.success(promotion));
         }
 
 }

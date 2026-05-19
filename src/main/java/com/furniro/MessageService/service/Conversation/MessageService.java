@@ -40,11 +40,7 @@ public class MessageService {
         messageRepository.save(message);
 
         // 4. return response
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Message read successfully")
-                .data(message)
-                .build());
+        return ResponseEntity.ok(ApiType.success(message));
     }
 
     public ResponseEntity<AType> getAllMessage(Integer conversationID, Integer page, Integer size) {
@@ -57,11 +53,7 @@ public class MessageService {
         Page<Message> messages = messageRepository.findAllByConversation(conversation, pageable);
 
         // 3. return response
-        return ResponseEntity.ok(ApiType.builder()
-                .code(200)
-                .message("Messages retrieved successfully")
-                .data(messages)
-                .build());
+        return ResponseEntity.ok(ApiType.success(messages));
     }
 
     @Transactional
