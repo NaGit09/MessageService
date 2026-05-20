@@ -52,6 +52,7 @@ public class SubscriptionService {
 
     public ResponseEntity<AType> getAllSubscribers
         (int page, int size, String sortBy) {
+            
         // 1. create pabeable from query string
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 

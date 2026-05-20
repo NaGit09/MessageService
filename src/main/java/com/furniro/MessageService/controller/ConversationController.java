@@ -22,8 +22,8 @@ public class ConversationController {
         return conversationService.createConversation(req);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<AType> getAllConversation(@RequestParam Integer userId) {
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<AType> getAllConversation(@PathVariable Integer userId) {
         return conversationService.getAllConversation(userId);
     }
 

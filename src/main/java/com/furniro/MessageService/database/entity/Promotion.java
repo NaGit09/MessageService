@@ -32,9 +32,9 @@ public class Promotion {
 
     private String type;
 
-    private String value;
+    private Double value;
 
-    private String status;
+    private Boolean status;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

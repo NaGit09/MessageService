@@ -1,6 +1,7 @@
 package com.furniro.MessageService.dto.req.promotion;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,11 +32,9 @@ public class PromotionReq {
     @Size(min = 2, max = 50, message = "Loại khuyến mãi phải từ 2-50 ký tự")
     private String type;
 
-    @NotBlank(message = "Giá trị khuyến mãi không được để trống")
-    @Size(min = 1, max = 50, message = "Giá trị khuyến mãi phải từ 1-50 ký tự")
-    private String value;
+    @NotNull(message = "Giá trị khuyến mãi không được để trống")
+    private Double value;
 
-    @NotBlank(message = "Trạng thái không được để trống")
-    @Size(min = 2, max = 50, message = "Trạng thái phải từ 2-50 ký tự")
-    private String status;
+    @NotNull(message = "Trạng thái không được để trống")
+    private Boolean status;
 }

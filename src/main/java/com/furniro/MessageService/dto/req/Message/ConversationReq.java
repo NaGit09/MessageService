@@ -6,8 +6,14 @@ import lombok.Data;
 
 @Data
 public class ConversationReq {
+
     private Integer buyerId;
+
     private Integer staffId;
+
     private String message;
+
     private MessageType messageType;
+
+    private Integer fileId;
 }

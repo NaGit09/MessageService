@@ -17,4 +17,5 @@ public class MessageReq {
     private Integer receiverId;
     private Integer senderId;
     private MessageType messageType;
+    private Integer fileId;
 }

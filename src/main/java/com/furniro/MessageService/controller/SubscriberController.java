@@ -25,15 +25,15 @@ public class SubscriberController {
 
     private final SubscriptionService subscriptionService;
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<AType> getAllSubscriber(
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "subscribedAt") String sortBy) {
         return subscriptionService.getAllSubscribers(page, size, sortBy);
     }
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<AType> createSubscriber(
         @Valid @RequestBody SubscriptionReq req) {
         return subscriptionService.createSubscribe(req);
