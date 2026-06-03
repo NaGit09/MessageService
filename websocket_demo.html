@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniro - Message Service WebSocket Demo</title>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for structure + custom styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #1a102f, #0d0b14);
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+        
+        /* Glassmorphism Styling */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f3f4f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+            outline: none;
+        }
+
+        /* Pulse animation for active indicator */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+        .pulse-glow {
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 85, 247, 0.5);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center justify-center">
+
+    <!-- Container -->
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
+        
+        <!-- Header banner -->
+        <div class="lg:col-span-12 flex flex-col md:flex-row justify-between items-start md:items-center glass-panel p-6 rounded-2xl gap-4">
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-indigo-400 bg-clip-text text-transparent">
+                    Furniro Message Service
+                </h1>
+                <p class="text-gray-400 text-sm mt-1">Real-time WebSocket & SockJS Tester with Kong Gateway integration</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="connection-badge" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30 flex items-center gap-2">
+                    <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                    Disconnected
+                </span>
+            </div>
+        </div>
+
+        <!-- Left Column: Settings and Controls -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Connection Settings Panel -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col gap-4">
+                <h2 class="text-lg font-semibold text-purple-300 flex items-center gap-2 border-b border-white/5 pb-2">
+                    ⚙️ Gateway & Authentication Settings
+                </h2>
+                
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-gray-400">Kong Gateway WebSocket URL</label>
+                    <input type="text" id="ws-url-input" class="glass-input px-3 py-2 rounded-lg text-sm font-mono" 
+                           value="http://localhost:8000/api/v1/furniro/message-service/ws">
+                </div>
+                
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-gray-400">JWT Authentication Token (Optional)</label>
+                    <input type="text" id="jwt-input" class="glass-input px-3 py-2 rounded-lg text-sm font-mono" 
+                           placeholder="Paste JWT to authenticate...">
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="flex flex-col gap-1 col-span-1">
+                        <label class="text-xs font-medium text-gray-400">Conversation ID</label>
+                        <input type="number" id="conv-id-input" class="glass-input px-3 py-2 rounded-lg text-sm" value="1">
+                    </div>
+                    <div class="flex flex-col gap-1 col-span-1">
+                        <label class="text-xs font-medium text-gray-400">Sender ID</label>
+                        <input type="number" id="sender-id-input" class="glass-input px-3 py-2 rounded-lg text-sm" value="1">
+                    </div>
+                    <div class="flex flex-col gap-1 col-span-1">
+                        <label class="text-xs font-medium text-gray-400">Receiver ID</label>
+                        <input type="number" id="receiver-id-input" class="glass-input px-3 py-2 rounded-lg text-sm" value="2">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-2">
+                    <button id="btn-connect" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-2.5 rounded-xl text-sm font-semibold transition shadow-lg hover:shadow-purple-500/20 active:scale-95">
+                        Connect WebSocket
+                    </button>
+                    <button id="btn-disconnect" disabled class="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 py-2.5 rounded-xl text-sm font-semibold transition active:scale-95">
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Console Logger -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col flex-1 min-h-[250px]">
+                <h2 class="text-lg font-semibold text-pink-300 flex justify-between items-center border-b border-white/5 pb-2 mb-3">
+                    <span>📟 Live Protocol Logs</span>
+                    <button id="clear-logs" class="text-xs text-gray-500 hover:text-gray-300 transition">Clear</button>
+                </h2>
+                <div id="logs-container" class="flex-1 overflow-y-auto text-xs font-mono text-gray-400 space-y-1.5 max-h-[250px] p-2 bg-black/30 rounded-lg border border-white/5">
+                    <div class="text-purple-400">[System] Ready to connect...</div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Right Column: Interactive Chat Interface -->
+        <div class="lg:col-span-7 flex flex-col">
+            <div class="glass-panel rounded-2xl flex flex-col h-[600px]">
+                
+                <!-- Chat Window Header -->
+                <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-sm shadow-md">
+                            💬
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-sm" id="chat-title">Conversation Channel #1</div>
+                            <div class="text-xs text-gray-400" id="chat-sub">Connecting status is shown on left</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Feed -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Example Incoming Message -->
+                    <div class="flex items-start gap-2.5 max-w-[80%]">
+                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold shadow border border-white/5">
+                            S
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <div class="bg-white/5 border border-white/10 text-gray-200 p-3 rounded-2xl rounded-tl-none text-sm shadow">
+                                Connect to a conversation using the settings panel to begin streaming real-time chats!
+                            </div>
+                            <span class="text-[10px] text-gray-500 self-start">System</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input area -->
+                <form id="chat-form" class="p-4 border-t border-white/5 flex gap-3">
+                    <input type="text" id="chat-input" disabled class="flex-1 glass-input px-4 py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+                           placeholder="Connect to send dynamic STOMP payloads...">
+                    <button type="submit" id="btn-send" disabled class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 rounded-xl text-sm font-semibold transition active:scale-95 shadow-md hover:shadow-pink-500/20">
+                        Send Payload
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SockJS and StompJS CDN dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+
+    <script>
+        // DOM Elements
+        const wsUrlInput = document.getElementById('ws-url-input');
+        const jwtInput = document.getElementById('jwt-input');
+        const convIdInput = document.getElementById('conv-id-input');
+        const senderIdInput = document.getElementById('sender-id-input');
+        const receiverIdInput = document.getElementById('receiver-id-input');
+        const btnConnect = document.getElementById('btn-connect');
+        const btnDisconnect = document.getElementById('btn-disconnect');
+        
+        const logsContainer = document.getElementById('logs-container');
+        const clearLogsBtn = document.getElementById('clear-logs');
+        
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const btnSend = document.getElementById('btn-send');
+        const chatTitle = document.getElementById('chat-title');
+        
+        const connectionBadge = document.getElementById('connection-badge');
+        const statusDot = document.getElementById('status-dot');
+
+        let stompClient = null;
+
+        // Logging function
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const logEl = document.createElement('div');
+            
+            let color = 'text-gray-400';
+            if (type === 'error') color = 'text-red-400';
+            if (type === 'success') color = 'text-green-400';
+            if (type === 'sent') color = 'text-purple-300';
+            if (type === 'received') color = 'text-pink-300';
+            
+            logEl.className = `${color}`;
+            logEl.innerHTML = `<span class="opacity-40">[${time}]</span> ${message}`;
+            logsContainer.appendChild(logEl);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        clearLogsBtn.addEventListener('click', () => {
+            logsContainer.innerHTML = '';
+        });
+
+        // Update visual badge statuses
+        function setConnectedState(state) {
+            if (state === 'connected') {
+                connectionBadge.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-green-500/20 text-green-300 border border-green-500/30 flex items-center gap-2";
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-green-400 pulse-glow";
+                connectionBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-green-400 pulse-glow"></span> Connected`;
+                
+                btnConnect.disabled = true;
+                btnDisconnect.disabled = false;
+                chatInput.disabled = false;
+                btnSend.disabled = false;
+                chatInput.placeholder = "Type message and hit Send...";
+            } else if (state === 'connecting') {
+                connectionBadge.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex items-center gap-2";
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-yellow-400 pulse-glow";
+                connectionBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-yellow-400 pulse-glow"></span> Connecting...`;
+                
+                btnConnect.disabled = true;
+                btnDisconnect.disabled = false;
+            } else {
+                connectionBadge.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30 flex items-center gap-2";
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-red-400";
+                connectionBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-red-400"></span> Disconnected`;
+                
+                btnConnect.disabled = false;
+                btnDisconnect.disabled = true;
+                chatInput.disabled = true;
+                btnSend.disabled = true;
+                chatInput.placeholder = "Connect to send dynamic STOMP payloads...";
+            }
+        }
+
+        // Add message bubble to container
+        function addMessageBubble(content, senderId, type = 'text') {
+            const bubbleWrap = document.createElement('div');
+            const isMe = parseInt(senderId) === parseInt(senderIdInput.value);
+            
+            bubbleWrap.className = `flex items-start gap-2.5 max-w-[80%] ${isMe ? 'self-end flex-row-reverse ml-auto' : ''}`;
+            
+            const initials = isMe ? 'ME' : 'OP';
+            const avatarColor = isMe ? 'bg-purple-600/30 text-purple-200 border-purple-500/30' : 'bg-white/10 text-gray-200 border-white/5';
+            const bubbleColor = isMe ? 'bg-gradient-to-br from-purple-600/80 to-indigo-600/80 border border-purple-500/30 text-white rounded-tr-none' : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none';
+            
+            bubbleWrap.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center text-xs font-bold shadow border">
+                    ${initials}
+                </div>
+                <div class="flex flex-col gap-1">
+                    <div class="${bubbleColor} p-3 rounded-2xl text-sm shadow">
+                        ${content}
+                    </div>
+                    <span class="text-[10px] text-gray-500 ${isMe ? 'self-end' : 'self-start'}">${isMe ? 'You' : 'Participant'}</span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(bubbleWrap);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Action: Connect to WebSocket via STOMP Over SockJS
+        btnConnect.addEventListener('click', () => {
+            const baseUrl = wsUrlInput.value.trim();
+            const jwt = jwtInput.value.trim();
+            const conversationId = convIdInput.value;
+
+            chatTitle.textContent = `Conversation Channel #${conversationId}`;
+
+            // Build dynamic connection URL appending jwt if specified
+            let connectionUrl = baseUrl;
+            if (jwt) {
+                const separator = baseUrl.includes('?') ? '&' : '?';
+                connectionUrl += `${separator}jwt=${encodeURIComponent(jwt)}`;
+            }
+
+            setConnectedState('connecting');
+            log(`Starting connection to: ${connectionUrl}...`);
+
+            // Initialize Stomp Client
+            stompClient = new StompJs.Client({
+                webSocketFactory: () => new SockJS(connectionUrl),
+                debug: (str) => {
+                    log(str);
+                },
+                reconnectDelay: 5000,
+                heartbeatIncoming: 4000,
+                heartbeatOutgoing: 4000
+            });
+
+            stompClient.onConnect = (frame) => {
+                setConnectedState('connected');
+                log('STOMP protocol connected successfully!', 'success');
+
+                // Subscribe to exact backend path: "/topic/conversation/{conversationId}"
+                const subscriptionTopic = `/topic/conversation/${conversationId}`;
+                log(`Subscribing to: ${subscriptionTopic}...`);
+                
+                stompClient.subscribe(subscriptionTopic, (message) => {
+                    if (message.body) {
+                        log(`Received payload: ${message.body}`, 'received');
+                        const data = JSON.parse(message.body);
+                        
+                        // Extract content from Spring Boot message entity
+                        // Backend Message entity has fields: content, senderId, type, etc.
+                        addMessageBubble(data.content, data.senderId, data.type);
+                    }
+                });
+            };
+
+            stompClient.onDisconnect = () => {
+                setConnectedState('disconnected');
+                log('Disconnected from STOMP broker.');
+            };
+
+            stompClient.onStompError = (frame) => {
+                setConnectedState('disconnected');
+                log(`Broker error: ${frame.headers['message']}`, 'error');
+                log(`Error payload: ${frame.body}`, 'error');
+            };
+
+            stompClient.activate();
+        });
+
+        // Action: Disconnect from WebSocket
+        btnDisconnect.addEventListener('click', () => {
+            if (stompClient) {
+                log('Deactivating STOMP client...');
+                stompClient.deactivate();
+                setConnectedState('disconnected');
+            }
+        });
+
+        // Action: Send Message over WebSocket
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text || !stompClient || !stompClient.connected) return;
+
+            const conversationId = parseInt(convIdInput.value);
+            const senderId = parseInt(senderIdInput.value);
+            const receiverId = parseInt(receiverIdInput.value);
+
+            // Construct payload matching backend MessageReq.java
+            const messagePayload = {
+                conversationId: conversationId,
+                content: text,
+                senderId: senderId,
+                receiverId: receiverId,
+                messageType: 'TEXT',
+                fileId: null
+            };
+
+            const destination = '/app/chat.sendMessage';
+            log(`Publishing payload to ${destination}: ${JSON.stringify(messagePayload)}`, 'sent');
+            
+            stompClient.publish({
+                destination: destination,
+                body: JSON.stringify(messagePayload)
+            });
+
+            // Optimistically add bubble to your own view
+            addMessageBubble(text, senderId);
+            chatInput.value = '';
+        });
+    </script>
+</body>
+</html>

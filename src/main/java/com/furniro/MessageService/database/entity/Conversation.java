@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import com.furniro.MessageService.util.enums.MessageType;
+
 @Entity
 @Table(name = "conversations")
 @Getter
@@ -31,6 +33,9 @@ public class Conversation {
     
     @Builder.Default
     private String lastMessageContent = "";
+
+    @Builder.Default
+    private MessageType lastMessageType = MessageType.TEXT;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

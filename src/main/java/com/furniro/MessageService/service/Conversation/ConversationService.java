@@ -38,6 +38,7 @@ public class ConversationService {
                 .buyerId(req.getBuyerId())
                 .staffId(req.getStaffId())
                 .lastMessageContent(req.getMessage())
+                .lastMessageType(req.getMessageType())
                 .build();
 
         conversationRepository.save(conversation);
