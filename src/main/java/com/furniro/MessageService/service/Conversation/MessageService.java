@@ -49,7 +49,7 @@ public class MessageService {
                 .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
 
         // 2. get all message by conversation
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
         Page<Message> messages = messageRepository.findAllByConversation(conversation, pageable);
 
         // 3. return response
