@@ -15,10 +15,10 @@ import com.furniro.MessageService.database.repository.PromotionRepository;
 import com.furniro.MessageService.database.repository.SubscriptionRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
+import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.dto.req.promotion.PromotionReq;
-import com.furniro.MessageService.exception.imp.PromotionException;
+import com.furniro.MessageService.exception.CustomException;
 import com.furniro.MessageService.service.Other.MailService;
-import com.furniro.MessageService.util.error.PromotionErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +71,7 @@ public class PromotionService {
 
                 Promotion promotion = promotionRepository.findById(id)
                                 .orElseThrow(() -> 
-                                    new PromotionException(PromotionErrorCode.PROMOTION_NOT_FOUND)
+                                    new CustomException(ErrorType.notFound("Promotion not found"))
                                 );
 
                 promotionRepository.delete(promotion);
@@ -90,7 +90,7 @@ public class PromotionService {
                 (PromotionReq req) {
                 Promotion promotion = promotionRepository.findById(req.getId())
                                 .orElseThrow(() -> 
-                                    new PromotionException(PromotionErrorCode.PROMOTION_NOT_FOUND)
+                                    new CustomException(ErrorType.notFound("Promotion not found"))
                                 );
 
                 promotion.setCode(req.getCode());

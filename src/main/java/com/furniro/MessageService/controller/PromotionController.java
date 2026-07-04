@@ -26,7 +26,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PromotionController {
 
-    final PromotionService promotionService;
+    private final PromotionService promotionService;
 
     @PostMapping("/")
     public ResponseEntity<AType> createPromotion(

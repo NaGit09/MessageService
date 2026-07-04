@@ -12,10 +12,10 @@ import com.furniro.MessageService.database.repository.MessageRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
 import com.furniro.MessageService.dto.req.Message.ConversationReq;
-import com.furniro.MessageService.exception.imp.MessageException;
+import com.furniro.MessageService.exception.CustomException;
+import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.service.kafka.KafkaProducer;
 import com.furniro.MessageService.util.enums.MessageType;
-import com.furniro.MessageService.util.error.MessageErrorCode;
 
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -74,7 +74,7 @@ public class ConversationService {
 
     public ResponseEntity<AType> getConversationById(int id) {
         Conversation conversation = conversationRepository.findById(id)
-                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.notFound("Conversation not found")));
 
         return ResponseEntity.ok(ApiType.success(conversation));
     }

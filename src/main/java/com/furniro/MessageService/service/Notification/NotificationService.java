@@ -11,9 +11,9 @@ import com.furniro.MessageService.database.entity.Notification;
 import com.furniro.MessageService.database.repository.NotificationRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
+import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.dto.req.Notify.NotificationReq;
-import com.furniro.MessageService.exception.imp.NotifyException;
-import com.furniro.MessageService.util.error.NotificationErrorCode;
+import com.furniro.MessageService.exception.CustomException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class NotificationService {
         Page<Notification> notifications = notificationRepository.findByUserID(receiverID, pageable);
 
         if (notifications.isEmpty()) {
-            throw new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND);
+            throw new CustomException(ErrorType.notFound("Notification not found"));
         }
 
         return ResponseEntity.ok(ApiType.success(notifications));
@@ -65,7 +65,7 @@ public class NotificationService {
         // find notify
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() ->
-                new NotifyException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+                new CustomException(ErrorType.notFound("Notification not found")));
                         
         // set read true
         notification.setIsRead(true);

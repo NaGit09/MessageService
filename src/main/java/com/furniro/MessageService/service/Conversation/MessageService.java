@@ -14,9 +14,9 @@ import com.furniro.MessageService.database.repository.ConversationRepository;
 import com.furniro.MessageService.database.repository.MessageRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
+import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.dto.req.Message.MessageReq;
-import com.furniro.MessageService.exception.imp.MessageException;
-import com.furniro.MessageService.util.error.MessageErrorCode;
+import com.furniro.MessageService.exception.CustomException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class MessageService {
     public ResponseEntity<AType> isRead(Integer messageID) {
         // 1. find message
         Message message = messageRepository.findById(messageID)
-                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.notFound("Message not found")));
 
         // 2. mark as read
         message.setIsRead(true);
@@ -46,7 +46,7 @@ public class MessageService {
     public ResponseEntity<AType> getAllMessage(Integer conversationID, Integer page, Integer size) {
         // 1. find conversation
         Conversation conversation = conversationRepository.findById(conversationID)
-                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.notFound("Conversation not found")));
 
         // 2. get all message by conversation
         Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
@@ -60,7 +60,7 @@ public class MessageService {
     public Message createMessage(MessageReq messageReq) {
         // 1. find conversation
         Conversation conversation = conversationRepository.findById(messageReq.getConversationId())
-                .orElseThrow(() -> new MessageException(MessageErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.notFound("Conversation not found")));
 
         // 2. create message
         Message message = Message.builder()

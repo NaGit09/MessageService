@@ -11,10 +11,10 @@ import com.furniro.MessageService.database.entity.Subscription;
 import com.furniro.MessageService.database.repository.SubscriptionRepository;
 import com.furniro.MessageService.dto.API.AType;
 import com.furniro.MessageService.dto.API.ApiType;
+import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.dto.req.Subscription.SubscriptionReq;
-import com.furniro.MessageService.exception.imp.SubscriptionException;
+import com.furniro.MessageService.exception.CustomException;
 import com.furniro.MessageService.service.Other.MailService;
-import com.furniro.MessageService.util.error.SubscriptionErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class SubscriptionService {
         (SubscriptionReq req) {
         // 1. check user subscribed
         if (subscriptionRepository.existsByEmail(req.getEmail())) {
-            throw new SubscriptionException(SubscriptionErrorCode.SUBSCRIPTION_ALREADY_EXISTS);
+            throw new CustomException(ErrorType.badRequest("Subscription already exists"));
         }
 
         // 2. Save subscription
@@ -67,7 +67,7 @@ public class SubscriptionService {
     (Integer id) {
         // 1. check user subscribed
         if (!subscriptionRepository.existsById(id)) {
-            throw new SubscriptionException(SubscriptionErrorCode.SUBSCRIPTION_NOT_FOUND);
+            throw new CustomException(ErrorType.notFound("Subscription not found"));
         }
 
         // 2. delete subscription
