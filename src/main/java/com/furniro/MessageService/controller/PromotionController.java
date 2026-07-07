@@ -55,4 +55,5 @@ public class PromotionController {
         req.setId(id);
         return promotionService.updatePromotion(req);
     }
+
 }

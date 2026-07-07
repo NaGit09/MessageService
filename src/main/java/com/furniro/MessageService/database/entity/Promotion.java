@@ -34,6 +34,12 @@ public class Promotion {
 
     private Double value;
 
+    private Double minSpend;
+
+    private LocalDateTime expiryDate;
+
+    private Integer maxUses;
+
     private Boolean status;
 
     @Builder.Default

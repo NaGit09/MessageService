@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +36,12 @@ public class PromotionReq {
 
     @NotNull(message = "Giá trị khuyến mãi không được để trống")
     private Double value;
+
+    private Double minSpend;
+
+    private LocalDateTime expiryDate;
+
+    private Integer maxUses;
 
     @NotNull(message = "Trạng thái không được để trống")
     private Boolean status;

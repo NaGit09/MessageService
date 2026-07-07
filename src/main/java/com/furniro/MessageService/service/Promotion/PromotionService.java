@@ -20,6 +20,8 @@ import com.furniro.MessageService.dto.req.promotion.PromotionReq;
 import com.furniro.MessageService.exception.CustomException;
 import com.furniro.MessageService.service.Other.MailService;
 
+import com.furniro.MessageService.service.kafka.KafkaProducer;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +33,7 @@ public class PromotionService {
         private final PromotionRepository promotionRepository;
         private final SubscriptionRepository subscriptionRepository;
         private final MailService mailService;
+        private final KafkaProducer kafkaProducer;
 
         public ResponseEntity<AType> createPromotion
                 (PromotionReq req) {
@@ -41,11 +44,30 @@ public class PromotionService {
                                 .description(req.getDescription())
                                 .type(req.getType())
                                 .value(req.getValue())
+                                .minSpend(req.getMinSpend())
+                                .expiryDate(req.getExpiryDate())
+                                .maxUses(req.getMaxUses())
                                 .status(req.getStatus())
                                 .build();
 
                 // 2. save promotion
                 promotionRepository.save(promotion);
+
+                // Publish CREATED event to Kafka
+                try {
+                        java.util.Map<String, Object> event = new java.util.HashMap<>();
+                        event.put("eventType", "CREATED");
+                        event.put("code", promotion.getCode());
+                        event.put("discountType", promotion.getType());
+                        event.put("discountValue", promotion.getValue());
+                        event.put("minSpend", promotion.getMinSpend());
+                        event.put("expiryDate", promotion.getExpiryDate() != null ? promotion.getExpiryDate().toString() : null);
+                        event.put("maxUses", promotion.getMaxUses());
+                        event.put("status", promotion.getStatus());
+                        kafkaProducer.send("promotion.events", event);
+                } catch (Exception e) {
+                        log.error("Failed to send Kafka event for promotion creation: {}", e.getMessage());
+                }
 
                 // 3. get all subscribers
                 List<Subscription> subscribers = subscriptionRepository.findAll();
@@ -74,7 +96,19 @@ public class PromotionService {
                                     new CustomException(ErrorType.notFound("Promotion not found"))
                                 );
 
+                String promoCode = promotion.getCode();
+
                 promotionRepository.delete(promotion);
+
+                // Publish DELETED event to Kafka
+                try {
+                        java.util.Map<String, Object> event = new java.util.HashMap<>();
+                        event.put("eventType", "DELETED");
+                        event.put("code", promoCode);
+                        kafkaProducer.send("promotion.events", event);
+                } catch (Exception e) {
+                        log.error("Failed to send Kafka event for promotion deletion: {}", e.getMessage());
+                }
 
                 return ResponseEntity.ok(ApiType.success("Promotion deleted successfully"));
         }
@@ -98,9 +132,28 @@ public class PromotionService {
                 promotion.setDescription(req.getDescription());
                 promotion.setType(req.getType());
                 promotion.setValue(req.getValue());
+                promotion.setMinSpend(req.getMinSpend());
+                promotion.setExpiryDate(req.getExpiryDate());
+                promotion.setMaxUses(req.getMaxUses());
                 promotion.setStatus(req.getStatus());
 
                 promotionRepository.save(promotion);
+
+                // Publish UPDATED event to Kafka
+                try {
+                        java.util.Map<String, Object> event = new java.util.HashMap<>();
+                        event.put("eventType", "UPDATED");
+                        event.put("code", promotion.getCode());
+                        event.put("discountType", promotion.getType());
+                        event.put("discountValue", promotion.getValue());
+                        event.put("minSpend", promotion.getMinSpend());
+                        event.put("expiryDate", promotion.getExpiryDate() != null ? promotion.getExpiryDate().toString() : null);
+                        event.put("maxUses", promotion.getMaxUses());
+                        event.put("status", promotion.getStatus());
+                        kafkaProducer.send("promotion.events", event);
+                } catch (Exception e) {
+                        log.error("Failed to send Kafka event for promotion update: {}", e.getMessage());
+                }
 
                 return ResponseEntity.ok(ApiType.success(promotion));
         }
