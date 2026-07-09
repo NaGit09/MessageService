@@ -1,6 +1,8 @@
 package com.furniro.MessageService.service.Conversation;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,15 +19,19 @@ import com.furniro.MessageService.dto.API.ApiType;
 import com.furniro.MessageService.dto.API.ErrorType;
 import com.furniro.MessageService.dto.req.Message.MessageReq;
 import com.furniro.MessageService.exception.CustomException;
+import com.furniro.MessageService.service.kafka.KafkaProducer;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+    private final KafkaProducer kafkaProducer;
 
     @Transactional
     public ResponseEntity<AType> isRead(Integer messageID) {
@@ -80,7 +86,25 @@ public class MessageService {
         messageRepository.save(message);
         conversationRepository.save(conversation);
 
-        // 5. return response
+        // 5. publish to Kafka if message is for the AI chatbot (receiverId = 1) and sent by buyer
+        if (Integer.valueOf(1).equals(message.getReceiverId()) && message.getSenderId().equals(conversation.getBuyerId())) {
+            log.info("Message for AI bot detected. Publishing message.created event to Kafka for conversation ID: {}", conversation.getId());
+            try {
+                Map<String, Object> event = new HashMap<>();
+                event.put("id", message.getId());
+                event.put("conversationId", conversation.getId());
+                event.put("content", message.getContent());
+                event.put("senderId", message.getSenderId());
+                event.put("receiverId", message.getReceiverId());
+                event.put("messageType", message.getType().name());
+                event.put("createdAt", message.getCreatedAt().toString());
+                kafkaProducer.send("message.created", event);
+            } catch (Exception e) {
+                log.error("Failed to publish message.created event to Kafka: {}", e.getMessage());
+            }
+        }
+
+        // 6. return response
         return message;
     }
 }
