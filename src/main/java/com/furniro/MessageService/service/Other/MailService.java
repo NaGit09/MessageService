@@ -26,7 +26,7 @@ public class MailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String activationLink = "http://localhost:8000/api/v1/furniro/auth-service/account/active?id=" + accountID;
+            String activationLink = "http://localhost:3000/auth/active?id=" + accountID;
 
             String content = "<h3>Chào " + fullName + ",</h3>"
                     + "<p>Vui lòng click vào link bên dưới để kích hoạt tài khoản:</p>"

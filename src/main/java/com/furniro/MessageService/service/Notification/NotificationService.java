@@ -30,7 +30,7 @@ public class NotificationService {
          Integer size,
          String sortBy) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
 
         Page<Notification> notifications = notificationRepository.findByUserID(receiverID, pageable);
 
